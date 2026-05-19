@@ -1,4 +1,4 @@
-name: CI Monorepo Pipeline 🚀
+name: CI Monorepo Pipeline
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
         run: npm run test:unit
 
   e2e-docker-tests:
-    [cite_start]needs: unit-and-component-tests
+    needs: unit-and-component-tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -35,7 +35,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Run Playwright E2E via Docker Compose 🐳
+      - name: Run Playwright E2E via Docker Compose
         run: npm run docker:test
 
       - name: Upload Playwright Test Report
