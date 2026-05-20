@@ -1,21 +1,56 @@
 version: "3.8"
 
 services:
+  postgres:
+    image: postgres:16
+
+    container_name: shopqa-db
+
+    restart: always
+
+    ports:
+      - "5432:5432"
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: shopqa
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   web-app:
     build:
       context: .
       dockerfile: Dockerfile.app
+
+    container_name: shopqa-web
+
     ports:
       - "3000:3000"
+
     environment:
-      - NODE_ENV=production
+      NODE_ENV: production
+
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/shopqa
+
+      JWT_SECRET: your-secret-key
+
+    depends_on:
+      - postgres
 
   playwright-tests:
     build:
       context: .
       dockerfile: Dockerfile.e2e
+
+    container_name: shopqa-e2e
+
     environment:
-      - BASE_URL=http://web-app:3000
+      BASE_URL: http://web-app:3000
+
     depends_on:
-      web-app:
-        condition: service_started
+      - web-app
+
+volumes:
+  postgres_data:
