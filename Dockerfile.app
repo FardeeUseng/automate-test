@@ -23,4 +23,4 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 3000
-CMD ["sh", "-c", "yarn prisma migrate deploy && yarn start"]
+CMD ["sh", "-c", "yarn prisma db push --skip-generate && yarn start"]
