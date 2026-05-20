@@ -1,22 +1,28 @@
-import { ProductCard } from "@/components/ProductCard";
+import ProductCard from "@/components/ProductCard";
 import { render, screen } from "@testing-library/react";
+import type { Product } from "@/types";
+
+const mockProduct: Product = {
+  id: 1,
+  name: "Macbook",
+  description: "A laptop",
+  price: 50000,
+  image: "/test.jpg",
+  stock: 10,
+  category: "electronics",
+};
 
 describe("ProductCard", () => {
   it("renders product info", () => {
-    render(<ProductCard title="Macbook" price={50000} />);
+    render(<ProductCard product={mockProduct} />);
 
-    expect(screen.getByText("Macbook")).toBeInTheDocument();
-
-    expect(screen.getByText("50000")).toBeInTheDocument();
+    expect(screen.getByTestId("product-name")).toHaveTextContent("Macbook");
+    expect(screen.getByTestId("product-price")).toHaveTextContent("฿50,000");
   });
 
   it("renders add to cart button", () => {
-    render(<ProductCard title="Macbook" price={50000} />);
+    render(<ProductCard product={mockProduct} />);
 
-    expect(
-      screen.getByRole("button", {
-        name: /add to cart/i,
-      }),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("add-to-cart-btn")).toBeInTheDocument();
   });
 });

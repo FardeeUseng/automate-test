@@ -14,10 +14,7 @@ const config: Config = {
     "^@/(.*)$": "<rootDir>/$1",
   },
 
-  testMatch: [
-    "**/__tests__/**/*.(spec|test).(ts|tsx)",
-    "**/*.(spec|test).(ts|tsx)",
-  ],
+  testMatch: ["<rootDir>/tests/**/*.(spec|test).(ts|tsx)"],
 
   collectCoverageFrom: [
     "components/**/*.{ts,tsx}",
