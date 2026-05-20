@@ -1,6 +1,6 @@
-FROM mcr.microsoft.com/playwright:v1.49.0-noble [cite: 52, 74]
+FROM mcr.microsoft.com/playwright:v1.49.0-noble
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 COPY . .
-CMD ["npx", "playwright", "test"] [cite: 52, 74]
+CMD ["yarn", "test:e2e"]
