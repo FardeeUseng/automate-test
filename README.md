@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ShopQA
+
+E-commerce web app built with Next.js, Prisma, and PostgreSQL. Includes full CI/CD pipeline with unit tests and end-to-end tests.
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Database**: PostgreSQL + Prisma ORM
+- **Auth**: JWT via `jose` + bcrypt
+- **Unit tests**: Jest + Testing Library
+- **E2E tests**: Playwright
+- **CI/CD**: GitHub Actions
+
+## Prerequisites
+
+- Node.js 20+
+- Yarn
+- Docker (for local PostgreSQL)
 
 ## Getting Started
 
-First, run the development server:
+**1. Install dependencies**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+yarn install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**2. Set up environment variables**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cp .env.example .env
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Edit `.env` and set a strong `JWT_SECRET`.
 
-## Learn More
+**3. Start the database**
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+docker compose up postgres -d
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**4. Push schema to database**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+yarn db:push
+```
 
-## Deploy on Vercel
+**5. (Optional) Seed demo data**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+yarn db:seed
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**6. Start the dev server**
+
+```bash
+yarn dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+## Environment Variables
+
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `JWT_SECRET` | Secret key for signing JWT tokens (min 32 chars) |
+| `BASE_URL` | App base URL (used for E2E tests) |
+
+## Scripts
+
+| Script | Description |
+|---|---|
+| `yarn dev` | Start development server |
+| `yarn build` | Build for production |
+| `yarn start` | Start production server |
+| `yarn lint` | Run ESLint |
+| `yarn test:unit` | Run Jest unit tests |
+| `yarn test:unit:coverage` | Run unit tests with coverage report |
+| `yarn test:e2e` | Run Playwright E2E tests |
+| `yarn test:e2e:ui` | Open Playwright interactive UI |
+| `yarn db:push` | Push Prisma schema to database |
+| `yarn db:migrate` | Create a new migration |
+| `yarn db:seed` | Seed the database with demo data |
+| `yarn db:studio` | Open Prisma Studio |
+
+## Running Tests
+
+### Unit tests
+
+```bash
+yarn test:unit
+```
+
+### E2E tests
+
+Make sure Postgres is running first:
+
+```bash
+docker compose up postgres -d
+yarn test:e2e
+```
+
+Playwright will automatically start the dev server if one isn't already running.
+
+## CI/CD
+
+GitHub Actions runs on every push and pull request to `main`:
+
+1. **unit-and-component-tests** — ESLint + Jest
+2. **e2e-tests** — builds the app, spins up a Postgres service container, and runs Playwright tests
