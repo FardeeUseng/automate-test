@@ -98,3 +98,37 @@ jobs:
     steps:
       - name: Deploy to Render
         run: curl -f ${{ secrets.RENDER_DEPLOY_HOOK }}
+
+      - name: Notify Discord (Success)
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [{
+                "title": "✅ Deploy สำเร็จ",
+                "color": 3066993,
+                "fields": [
+                  {"name": "Branch", "value": "${{ github.ref_name }}", "inline": true},
+                  {"name": "Commit", "value": "${{ github.actor }}", "inline": true},
+                  {"name": "Message", "value": "${{ github.event.head_commit.message }}"}
+                ]
+              }]
+            }' \
+            ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Notify Discord (Failure)
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [{
+                "title": "❌ Deploy ล้มเหลว",
+                "color": 15158332,
+                "fields": [
+                  {"name": "Branch", "value": "${{ github.ref_name }}", "inline": true},
+                  {"name": "Commit", "value": "${{ github.actor }}", "inline": true},
+                  {"name": "Message", "value": "${{ github.event.head_commit.message }}"}
+                ]
+              }]
+            }' \
+            ${{ secrets.DISCORD_WEBHOOK }}
