@@ -16,7 +16,7 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
-    "docker:test": "docker-compose up --build --abort-on-container-exit"
+    "docker:test": "docker compose up --build --abort-on-container-exit"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",
