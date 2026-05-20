@@ -28,24 +28,52 @@ jobs:
       - name: Run Jest Testing
         run: yarn test:unit
 
-  e2e-docker-tests:
+  e2e-tests:
     needs: unit-and-component-tests
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: shopqa
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/shopqa
+      JWT_SECRET: ci-test-secret-key-for-github-actions
     steps:
       - name: Checkout Code
         uses: actions/checkout@v5
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: 'yarn'
 
-      - name: Run Playwright E2E via Docker Compose
-        run: yarn docker:test
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile --ignore-engines
 
-      - name: Copy Playwright Report from Container
-        if: failure()
-        run: docker cp shopqa-e2e:/app/playwright-report ./playwright-report || true
+      - name: Generate Prisma Client
+        run: yarn prisma generate
 
-      - name: Upload Playwright Test Report
+      - name: Run Database Migrations
+        run: yarn prisma migrate deploy
+
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run E2E Tests
+        run: yarn test:e2e
+
+      - name: Upload Playwright Report
         if: failure()
         uses: actions/upload-artifact@v4
         with:
