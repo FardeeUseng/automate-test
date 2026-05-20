@@ -67,6 +67,9 @@ jobs:
       - name: Run Database Migrations
         run: yarn prisma migrate deploy
 
+      - name: Build App
+        run: yarn build
+
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
 
