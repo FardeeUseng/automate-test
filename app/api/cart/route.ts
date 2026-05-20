@@ -47,7 +47,7 @@ export const POST = apiRoute(async (req) => {
 
   const cart = await getOrCreateCart(user.id);
 
-  const existing = cart.items.find((i) => i.productId === body.productId);
+  const existing = cart.items.find((i: { productId: number }) => i.productId === body.productId);
   const newQty = (existing?.quantity ?? 0) + body.quantity;
 
   if (newQty > product.stock)

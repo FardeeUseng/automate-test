@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/playwright:v1.49.0-noble
 WORKDIR /app
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile --ignore-engines
 COPY . .
 CMD ["yarn", "test:e2e"]
