@@ -1,6 +1,6 @@
 "use client";
 // app/products/page.tsx
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/types";
 
@@ -21,23 +21,24 @@ export default function ProductsPage() {
   const [category, setCategory] = useState("");
   const [cartIds, setCartIds] = useState<Set<number>>(new Set());
 
-  const fetchProducts = useCallback(async () => {
-    setLoading(true);
-    const params = new URLSearchParams();
-    if (search) params.set("search", search);
-    if (category) params.set("category", category);
-    const res = await fetch(`/api/products?${params}`);
-    const json = await res.json();
-    if (json.data) {
-      setProducts(json.data.products);
-      setTotal(json.data.total);
-    }
-    setLoading(false);
-  }, [search, category]);
-
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    let cancelled = false;
+    async function run() {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (category) params.set("category", category);
+      const res = await fetch(`/api/products?${params}`);
+      const json = await res.json();
+      if (!cancelled && json.data) {
+        setProducts(json.data.products);
+        setTotal(json.data.total);
+      }
+      if (!cancelled) setLoading(false);
+    }
+    run();
+    return () => { cancelled = true; };
+  }, [search, category]);
 
   // Load cart to mark items already added
   useEffect(() => {

@@ -2,7 +2,7 @@
 // components/Navbar.tsx
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+
 import type { User } from "@/types";
 
 interface Props {
@@ -13,8 +13,6 @@ interface Props {
 export default function Navbar({ user, cartCount = 0 }: Props) {
   const pathname = usePathname();
   const router = useRouter();
-  const [menuOpen, setMenuOpen] = useState(false);
-
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
