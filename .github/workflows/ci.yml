@@ -64,14 +64,20 @@ jobs:
       - name: Generate Prisma Client
         run: yarn prisma generate
 
-      - name: Run Database Migrations
-        run: yarn prisma migrate deploy
+      - name: Push Database Schema
+        run: yarn prisma db push --skip-generate
 
       - name: Build App
         run: yarn build
 
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
+
+      - name: Start App Server
+        run: yarn start &
+
+      - name: Wait for App to be Ready
+        run: timeout 60 bash -c 'until curl -sf http://localhost:3000; do sleep 2; done'
 
       - name: Run E2E Tests
         run: yarn test:e2e
